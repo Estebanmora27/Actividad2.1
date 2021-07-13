@@ -1,0 +1,56 @@
+version: "3"
+services:
+        db:
+                image: mysql:latest
+                container_name: mysql2
+                #environment:
+                        #MYSQL_ROOT_PASSWORD: mora2
+                        #MYSQL_DATABASE: ejercicio2
+                        #MYSQL_USER: mora2
+                        #MYSQL_PASSWORD: mora2
+                volumes:
+                        - volumenmysql:/var/lib/mysql
+                ports:
+                        - "8001:3306"
+                networks:
+                        - produccion_default
+                env_file:
+                        - produccion.env
+        mongodb:
+                image: mongo:latest
+                container_name: mongo2
+                #environment:
+                        #MONGO_INITDB_ROOT_USERNAME: mora2
+                        #MONGO_INITDB_ROOT_PASSWORD: mora2
+                        #MONGO_INITDB_DATABASE: mongo2
+                volumes:
+                        - volumenmongo:/data/db
+                ports:
+                        - "27018:27017"
+                networks:
+                        - produccion_default
+                env_file:
+                        - produccion.env
+        web:
+                build: .
+                container_name: app2
+                depends_on:
+                        - db
+                        - mongodb
+                ports:
+                        - "8090:80"
+                links:
+                        - mongodb
+                        - db
+                networks:
+                        - produccion_default
+                env_file:
+                        - produccion.env
+volumes:
+        volumenmysql:
+        volumenmongo:
+networks:
+        default:
+                external: true
+        produccion_default:
+                external: true

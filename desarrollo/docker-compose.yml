@@ -1,0 +1,52 @@
+version: "3"
+services: 
+        db:
+                image: mysql:latest
+                container_name: mysql1
+                #environment:
+                        #MYSQL_ROOT_PASSWORD: mora
+                        #MYSQL_DATABASE: ejercicio
+                        #MYSQL_USER: mora
+                        #MYSQL_PASSWORD: mora
+                restart: always
+                ports:
+                        - "8000:3306"
+                volumes:
+                        - ./dump:/docker-entrypoint-initdb.d
+                networks:
+                        - desarrollo_default
+                env_file:
+                        - desarrollo.env
+        mongodb:
+                image: mongo:latest
+                container_name: mongo1
+                #environment:
+                        #MONGO_INITDB_ROOT_USERNAME: mora
+                        #MONGO_INITDB_ROOT_PASSWORD: mora
+                        #MONGO_INITDB_DATABASE: mongo
+                ports:
+                        - "27017:27017"
+                networks:
+                        - desarrollo_default
+                env_file:
+                        - desarrollo.env
+        web:
+                 build: .
+                 container_name: app1
+                 depends_on:
+                         - db
+                         - mongodb
+                 ports:
+                         - "8080:80"
+                 links:
+                         - mongodb
+                         - db
+                 networks:
+                         - desarrollo_default
+                 env_file:
+                         - desarrollo.env
+networks:
+        default:
+                external: true
+        desarrollo_default:
+                external: true
